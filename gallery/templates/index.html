@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <ul>
+            {% for image in images %}
+            <li><img src="{{ url_for('static', filename=['gallery', image.filename ]|join('/')) }}"/></li>
+            {% endfor %}
+        </ul>
+        <p>miao</p>
+    </body>
+</html>
