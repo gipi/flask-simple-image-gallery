@@ -12,11 +12,14 @@
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.masonry.min.js') }}"></script>
         <script type="text/javascript">
         $(function(){
-                $('#container').masonry({
+            var $container = $('#container');
+            $container.imagesLoaded(function() {
+                $container.masonry({
                     // options
                     itemSelector : '.item',
                     columnWidth : 240
-                    });
+                });
+            });
         });
         </script>
         <ul id="container">
