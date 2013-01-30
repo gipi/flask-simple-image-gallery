@@ -2,7 +2,9 @@ from flask import Blueprint, render_template, request, abort
 from .models import Image
 
 
-gallery = Blueprint('gallery', __name__, template_folder='templates')
+# Static files only work for blueprints registered with url_prefix
+#  https://github.com/mitsuhiko/flask/issues/348
+gallery = Blueprint('gallery', __name__, template_folder='templates', static_folder='static')
 
 
 @gallery.route('/')

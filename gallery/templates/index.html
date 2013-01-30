@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <ul>
+        <style>
+        .item {
+            float:left;
+            width:250px;
+            margin:10px;
+        }
+        </style>
+        <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.masonry.min.js') }}"></script>
+        <script type="text/javascript">
+        $(function(){
+                $('#container').masonry({
+                    // options
+                    itemSelector : '.item',
+                    columnWidth : 240
+                    });
+        });
+        </script>
+        <ul id="container">
             {% for image in images %}
-            <li><img src="{{ url_for('static', filename=['gallery', image.filename ]|join('/')) }}"/></li>
+            <img class="item" src="{{ url_for('static', filename=['gallery', image.filename ]|join('/')) }}"/>
             {% endfor %}
         </ul>
         <p>miao</p>
