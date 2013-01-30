@@ -19,10 +19,19 @@ def json():
     the images.
     """
     images = Image.all()
-    if request.method == 'GET' and 'start' in request.args:
-        images = images[int(request.args('start')):]
-    if request.method == 'GET' and 'stop' in request.args:
-        images = images[int(request.args.get('stop')):]
+    start = 0
+    stop = len(images)
+
+    try:
+        if request.method == 'GET' and 'start' in request.args:
+            start = int(request.args.get('start'))
+        if request.method == 'GET' and 'stop' in request.args:
+            stop = int(request.args.get('stop'))
+    except ValueError:
+        current_app.logger.debug(request)
+        return ("start/stop parameters must be numeric", 400)
+
+    images = images[start:stop]
 
     image_filenames = map(lambda x: x.filename, images)
 
