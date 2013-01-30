@@ -1,0 +1,12 @@
+Introduction
+------------
+
+This simple Flask application make easy to publish a gallery of images
+contained in a directory. Use the unix modification time to order images
+with the most recent to the top.
+
+In order to test it you can install the dependencies using pip
+
+ $ pip install -r dependencies.txt
+
+The images must be in a directory pointed by GALLERY_ROOT_DIR settings.
