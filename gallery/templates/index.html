@@ -26,11 +26,13 @@
             })
 
             socket.on('stream', function() {
-                var f;
-                var Place = 0;
-                f = uploaded_file.slice(Place, Place + Math.min(524288, (uploaded_file.size - Place)));
+                var f = uploaded_file.slice();
 
                 fileReader.readAsBinaryString(f)
+            });
+
+            socket.on('error', function(data) {
+                alert(data);
             });
 
             //socket.emit('localized');I//
@@ -47,12 +49,12 @@
                 fileReader.onload = function(evt) {
                     console.log('onload: ');
                     console.log(evt);
-                    socket.emit('upload', {name: file_uploader.value, chunk: evt.target.result});
+                    socket.emit('upload', {chunk: evt.target.result});
                 }
 
                 uploaded_file = evt.target.files[0]
 
-                socket.emit('start', {size: uploaded_file.size});
+                socket.emit('start', {size: uploaded_file.size, name: file_uploader.value});
             }
 
             file_uploader.addEventListener('change', on_file_chose);

@@ -4,11 +4,23 @@ from werkzeug.wsgi import SharedDataMiddleware
 from socketio.server import SocketIOServer
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
-import codecs
 
+import tempfile
+import hashlib
+import shutil
+import os
 from gallery.views import gallery
 
 
+ROOT_DIR = os.path.dirname(__file__)
+
+UPLOAD_DIR = os.path.join(ROOT_DIR, 'uploads')
+UPLOAD_ALLOWED_EXTENSIONS = (
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+)
 app = Flask(__name__)
 app.register_blueprint(gallery, url_prefix='/gallery')
 
@@ -22,14 +34,28 @@ class DefaultNamespace(BaseNamespace):
 
     def on_start(self, data):
         app.logger.debug('on_start: %s' % data)
+        # this actually is a path like C:\\blablabla\img.jpeg
+        self.name = data['name']
         self.emit('stream', {})
 
     def on_upload(self, data):
         app.logger.debug('on_upload %s' % data)
+        # check for file extension
+        ext = self.name.split('.')[-1]
+        if ext not in UPLOAD_ALLOWED_EXTENSIONS:
+            self.emit('error', 'extension not allowed')
+            return
         # client side must be readAsBinaryString and here we MUST decode it
         # choosing latin-1 otherwise UnicodeEncodeError appears.
-        with codecs.open('/tmp/upload', mode='w+b', encoding='latin-1') as f:
-            f.write(data['chunk'])
+        with tempfile.NamedTemporaryFile(mode='w+b') as f:
+            # save into a temporary file and to the end rename it with the md5 of the contents
+            app.logger.debug('save into file \'%s\'' % f.name)
+            h = hashlib.md5()
+            chunk = data['chunk']
+            f.write(chunk.encode('latin-1'))
+            h.update(chunk.encode('latin-1'))
+
+            shutil.copy(f.name, os.path.join(UPLOAD_DIR, '%s.%s' % (h.hexdigest(), ext)))
 
 @app.route("/socket.io/<path:path>")
 def run_socketio(path):
