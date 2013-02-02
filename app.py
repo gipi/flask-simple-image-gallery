@@ -7,6 +7,8 @@ from socketio.server import SocketIOServer
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
 
+import settings
+
 import tempfile
 import hashlib
 import shutil
@@ -37,6 +39,8 @@ class User(UserMixin):
         return '<User: %s>' % self.name
 
 app = Flask(__name__)
+app.config.from_object(settings)
+
 app.register_blueprint(gallery, url_prefix='/gallery')
 login_manager = LoginManager()
 login_manager.setup_app(app)
