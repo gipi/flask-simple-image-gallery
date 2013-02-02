@@ -10,3 +10,9 @@ In order to test it you can install the dependencies using pip
  $ pip install -r dependencies.txt
 
 The images must be in a directory pointed by GALLERY_ROOT_DIR settings.
+
+To test the web application you can do something like this:
+
+ $ python app.py
+
+and visit http://localhost:8080.
