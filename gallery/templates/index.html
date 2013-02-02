@@ -10,9 +10,15 @@
         </style>
 {% endblock %}
 {% block body_content %}
-        <header>
+        <header class="navbar navbar-inverse navbar-fixed-top row">
+            <h2 class="span2">Pls</h2>
             {% if current_user.is_authenticated() %}
-            <h2>{{ current_user.name }}</h2><a href="{{ url_for('gallery.logout') }}">logout</a>
+            <h2 class="span4"><i class="icon-user"></i>{{ current_user.name }}</h2>
+            <div class="span6" id="image_uploader_container">
+                <input id="file_uploader" type="file" name="file"/>
+                <button>post image</button>
+            </div>
+            <div class="2" id='logout_container'><i class="icon-off"></i><a href="{{ url_for('gallery.logout') }}">logout</a></div>
             {% else %}
             <form method="post">
                 <input type="text" name="username"/>
@@ -21,7 +27,6 @@
             </form>
             {% endif %}
         </header>
-        <input id="file_uploader" type="file" name="file"/>
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.masonry.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
