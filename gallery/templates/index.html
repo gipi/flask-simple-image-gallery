@@ -11,6 +11,17 @@
             margin:10px;
         }
         </style>
+        <header>
+            {% if current_user.is_authenticated() %}
+            <h2>{{ current_user.name }}</h2>
+            {% else %}
+            <form method="post">
+                <input type="text" name="username"/>
+                <input type="password" name="password"/>
+                <input type="submit" value="sign in"/>
+            </form>
+            {% endif %}
+        </header>
         <input id="file_uploader" type="file" name="file"/>
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.masonry.min.js') }}"></script>

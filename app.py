@@ -1,5 +1,6 @@
 # encoding:utf-8
 from flask import Flask, request
+from flask.ext.login import LoginManager, UserMixin, current_user
 from werkzeug.wsgi import SharedDataMiddleware
 from socketio.server import SocketIOServer
 from socketio import socketio_manage
@@ -21,8 +22,28 @@ UPLOAD_ALLOWED_EXTENSIONS = (
     'png',
     'gif',
 )
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.name = username
+        self.id   = username
+
+    @classmethod
+    def users(cls, username):
+        return User('pippo')
+
+    def str(self):
+        return '<User: %s>' % self.name
+
 app = Flask(__name__)
 app.register_blueprint(gallery, url_prefix='/gallery')
+login_manager = LoginManager()
+login_manager.setup_app(app)
+
+@login_manager.user_loader
+def load_user(userid):
+    user = User.users(userid)
+    return user
 
 class DefaultNamespace(BaseNamespace):
     def __init__(self, *args, **kwargs):
@@ -33,13 +54,20 @@ class DefaultNamespace(BaseNamespace):
             args=args, endpoint=self.ns_name))
 
     def on_start(self, data):
-        app.logger.debug('on_start: %s' % data)
+        app.logger.debug('%s:on_start: %s' % (self.request['user'], data))
         # this actually is a path like C:\\blablabla\img.jpeg
         self.name = data['name']
         self.emit('stream', {})
 
     def on_upload(self, data):
-        app.logger.debug('on_upload %s' % data)
+        # upload the file content into a directory named as the user with
+        # the name given by the md5 of its content
+        if not self.request['user'].is_authenticated():
+            app.logger.error('user not authenticated')
+            self.emit('error: you are not authenticated')
+            return
+
+        app.logger.debug('%s:on_upload %s' % (self.request['user'], data))
         # check for file extension
         ext = self.name.split('.')[-1]
         if ext not in UPLOAD_ALLOWED_EXTENSIONS:
@@ -48,18 +76,38 @@ class DefaultNamespace(BaseNamespace):
         # client side must be readAsBinaryString and here we MUST decode it
         # choosing latin-1 otherwise UnicodeEncodeError appears.
         with tempfile.NamedTemporaryFile(mode='w+b') as f:
-            # save into a temporary file and to the end rename it with the md5 of the contents
             app.logger.debug('save into file \'%s\'' % f.name)
             h = hashlib.md5()
             chunk = data['chunk']
             f.write(chunk.encode('latin-1'))
             h.update(chunk.encode('latin-1'))
 
-            shutil.copy(f.name, os.path.join(UPLOAD_DIR, '%s.%s' % (h.hexdigest(), ext)))
+            upload_user_dir = os.path.join(UPLOAD_DIR, self.request['user'].name)
+            if not os.access(upload_user_dir):
+                # FIXME: check for permission
+                os.mkdir(upload_user_dir)
+
+            uploaded_file_path = os.path.join(upload_user_dir, '%s.%s' % (h.hexdigest(), ext))
+
+            shutil.copy(f.name,  uploaded_file_path)
 
 @app.route("/socket.io/<path:path>")
 def run_socketio(path):
-    socketio_manage(request.environ, {'/default': DefaultNamespace})
+    """from http://gevent-socketio.readthedocs.org/en/latest/main.html#socketio.socketio_manage
+    
+    The request object is not required, but will probably be
+    useful to pass framework-specific things into your Socket and
+    Namespace functions. It will simply be attached to the Socket
+    and Namespace object (accessible through self.request in both
+    cases), and it is not accessed in any case by the gevent-socketio library.
+    """
+    # pass as request the object contained in the proxied current_user so
+    # to have possibility to check for authentication
+    req = {
+        'user':current_user._get_current_object(),
+    }
+    app.logger.info('user \'%s\' has connected' % req['user'])
+    socketio_manage(request.environ, {'/default': DefaultNamespace}, request=req)
     return ''
 
 if __name__ == '__main__':

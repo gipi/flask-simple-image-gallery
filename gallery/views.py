@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, render_template, request, current_app
+from flask.ext.login import login_user
 import simplejson
 from .models import Image
 
@@ -7,9 +8,15 @@ from .models import Image
 #  https://github.com/mitsuhiko/flask/issues/348
 gallery = Blueprint('gallery', __name__, template_folder='templates', static_folder='static')
 
-
-@gallery.route('/')
+@gallery.route('/', methods=['GET', 'POST',])
 def show_gallery():
+    if request.method == 'POST':
+        if 'username' in request.form and 'password' in request.form:
+            username = request.form['username']
+            password = request.form['password']
+            current_app.logger.debug('%s:%s' % (username, password))
+            if username == 'test' and password == 'password':
+                login_user(app.User.users(''))
     images = Image.all()
     return render_template('index.html', images=images)
 
@@ -46,3 +53,6 @@ def upload():
 
         return ("ok", 201,)
 
+# FIXME: make more modular to avoid the import below
+# this import is here to avoid circular hell import
+import app
