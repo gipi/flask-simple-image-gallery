@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-    <title>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    </title>
-    <body>
+{% extends "bootstrap_responsive.html" %}
+{% block style %}
+{{ super() }}
         <style>
         .item {
             float:left;
@@ -11,6 +8,8 @@
             margin:10px;
         }
         </style>
+{% endblock %}
+{% block body_content %}
         <header>
             {% if current_user.is_authenticated() %}
             <h2>{{ current_user.name }}</h2>
@@ -81,11 +80,4 @@
             });
         });
         </script>
-        <ul id="container">
-            {% for image in images %}
-            <img class="item" src="{{ url_for('static', filename=['gallery', image.filename ]|join('/')) }}"/>
-            {% endfor %}
-        </ul>
-        <p>miao</p>
-    </body>
-</html>
+{% endblock %}
