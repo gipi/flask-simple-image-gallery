@@ -1,10 +1,13 @@
 # encoding:utf-8
 from flask import Flask, request
 from flask.ext.login import LoginManager, UserMixin, current_user
+from flask.ext.bootstrap import Bootstrap
 from werkzeug.wsgi import SharedDataMiddleware
 from socketio.server import SocketIOServer
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
+
+import settings
 
 import tempfile
 import hashlib
@@ -36,9 +39,13 @@ class User(UserMixin):
         return '<User: %s>' % self.name
 
 app = Flask(__name__)
+app.config.from_object(settings)
+
 app.register_blueprint(gallery, url_prefix='/gallery')
 login_manager = LoginManager()
 login_manager.setup_app(app)
+
+Bootstrap(app)
 
 @login_manager.user_loader
 def load_user(userid):

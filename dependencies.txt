@@ -1,4 +1,5 @@
 Flask-Login==0.1.3
+flask-bootstrap==2.2
 Flask==0.9
 simplejson==3.0.7
 gevent-socketio==0.3.5-rc2

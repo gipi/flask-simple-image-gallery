@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, current_app
-from flask.ext.login import login_user
+from flask import Blueprint, render_template, request, current_app, redirect, url_for
+from flask.ext.login import login_user, logout_user
 import simplejson
 from .models import Image
 
@@ -19,6 +19,11 @@ def show_gallery():
                 login_user(app.User.users(''))
     images = Image.all()
     return render_template('index.html', images=images)
+
+@gallery.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('.show_gallery'))
 
 @gallery.route('/json')
 def json():
