@@ -1,35 +1,7 @@
-{% extends "bootstrap_responsive.html" %}
-{% block style %}
-{{ super() }}
-        <style>
-        .item {
-            float:left;
-            width:220px;
-            margin:10px;
-        }
-        </style>
-{% endblock %}
-{% block body_content %}
-        <header class="navbar navbar-inverse navbar-fixed-top row">
-            <h2 class="span2">Pls</h2>
-            {% if current_user.is_authenticated() %}
-            <h2 class="span4"><i class="icon-user"></i>{{ current_user.name }}</h2>
-            <div class="span6" id="image_uploader_container">
-                <input id="file_uploader" type="file" name="file"/>
-                <button>post image</button>
-            </div>
-            <div class="2" id='logout_container'><i class="icon-off"></i><a href="{{ url_for('gallery.logout') }}">logout</a></div>
-            {% else %}
-            <form method="post">
-                <input type="text" name="username"/>
-                <input type="password" name="password"/>
-                <input type="submit" value="sign in"/>
-            </form>
-            {% endif %}
-        </header>
-        <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.masonry.min.js') }}"></script>
+{% extends "base.html" %}
+{% block main_content %}
         <script type="text/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script type="text/javascript">
         (function(){
             var socket = io.connect('http://localhost:8080/default');
@@ -41,6 +13,10 @@
             })
 
             socket.on('stream', function() {
+                /*if(uploaded_file.webkitSlice) 
+                    f = uploaded_file.webkitSlice(Place, Place + Math.min(524288, (uploaded_file.size - Place)));
+                else
+                    f = uploaded_file.mozSlice(Place, Place + Math.min(524288, (uploaded_file.size - Place)));*/
                 var f = uploaded_file.slice();
 
                 fileReader.readAsBinaryString(f)
@@ -76,13 +52,47 @@
         })();
         $(function(){
             var $container = $('#container');
-            $container.imagesLoaded(function() {
-                $container.masonry({
-                    // options
-                    itemSelector : '.item',
-                    columnWidth : 240
-                });
-            });
+
+            var gCurPage = 0;// this will maintain the current page number
+
+            // since we want to load from a JSON with a custom page indicator we have to
+            // indicate pathParse, template
+            $container.infinitescroll({
+                    nextSelector: 'nav a:first',
+                    navSelector:  'nav',
+                    itemSelector: '#container img.item',
+                    debug:        true,
+                    dataType:     'json',
+                    path:         function(curPage) {
+                        gCurPage = curPage;
+                        return '/gallery/json';
+                    },
+                    template:     function(data) {
+                        console.log(data);
+                        return '<h1>porcodio ' + gCurPage + ' </h1>';
+                    }
+                },
+                function(newElement) {
+                    var $elements = $(newElement);
+                    $container.masonry('appended', $elements);
+                }
+            );
         });
         </script>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span2">
+                    <ul>
+                        <li>miao</li>
+                        <li>miao</li>
+                        <li>miao</li>
+                    </ul>
+                </div>
+                <div class="span10">
+                        <li>miao</li>
+                        <li>miao</li>
+                        <li>miao</li>
+                </div>
+            </div>
+        </div>
 {% endblock %}
