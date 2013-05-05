@@ -105,7 +105,7 @@ class DefaultNamespace(BaseNamespace):
             self.emit('error: you are not authenticated')
             return
 
-        app.logger.debug('%s:on_upload %s' % (self.request['user'], data))
+        app.logger.debug('%s:on_upload %s' % (self.request['user'], data['chunk'][:64]))
         # check for file extension
         ext = self.name.split('.')[-1]
         if ext not in UPLOAD_ALLOWED_EXTENSIONS:
