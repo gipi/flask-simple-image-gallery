@@ -23,3 +23,4 @@ following configuration variables:
 
  SECRET_KEY: random string containing crypto stuffs
  GALLERY_ROOT_DIR: absolute path to your image containing directory
+ DATABASE: peewee database configuration

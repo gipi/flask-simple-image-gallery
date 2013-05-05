@@ -1,7 +1,11 @@
 # encoding:utf-8
-from flask import Flask, request
-from flask.ext.login import LoginManager, UserMixin, current_user
+from flask import Flask, request, render_template
+from flask.ext.login import current_user
 from flask.ext.bootstrap import Bootstrap
+from flask_peewee.db import Database
+from peewee import ForeignKeyField, TextField, BooleanField, DateTimeField
+from flask.ext.security import Security, PeeweeUserDatastore, \
+    UserMixin, RoleMixin, login_required
 from werkzeug.wsgi import SharedDataMiddleware
 from socketio.server import SocketIOServer
 from socketio import socketio_manage
@@ -13,7 +17,7 @@ import tempfile
 import hashlib
 import shutil
 import os
-from gallery.views import gallery
+
 
 
 ROOT_DIR = os.path.dirname(__file__)
@@ -26,31 +30,58 @@ UPLOAD_ALLOWED_EXTENSIONS = (
     'gif',
 )
 
-class User(UserMixin):
-    def __init__(self, username):
-        self.name = username
-        self.id   = username
 
-    @classmethod
-    def users(cls, username):
-        return User('pippo')
-
-    def str(self):
-        return '<User: %s>' % self.name
-
+from gallery.views import gallery
 app = Flask(__name__)
 app.config.from_object(settings)
 
+# Create database connection object
+db = Database(app)
+
+class Role(db.Model, RoleMixin):
+    name = TextField(unique=True)
+    description = TextField(null=True)
+
+class User(db.Model, UserMixin):
+    email = TextField()
+    password = TextField()
+    active = BooleanField(default=True)
+    confirmed_at = DateTimeField(null=True)
+
+    def __repr__(self):
+        return '%s:%s' % (self.__class__, self.email,)
+
+class UserRoles(db.Model):
+    # Because peewee does not come with built-in many-to-many
+    # relationships, we need this intermediary class to link
+    # user to roles.
+    user = ForeignKeyField(User, related_name='roles')
+    role = ForeignKeyField(Role, related_name='users')
+    name = property(lambda self: self.role.name)
+    description = property(lambda self: self.role.description)
+
+# Setup Flask-Security
+user_datastore = PeeweeUserDatastore(db, User, Role, UserRoles)
+security = Security(app, user_datastore)
+
+
 app.register_blueprint(gallery, url_prefix='/gallery')
-login_manager = LoginManager()
-login_manager.setup_app(app)
+
 
 Bootstrap(app)
 
-@login_manager.user_loader
-def load_user(userid):
-    user = User.users(userid)
-    return user
+@app.route('/')
+@login_required
+def home():
+    return render_template('index.html')
+
+# Create a user to test with
+@app.before_first_request
+def create_user():
+    for Model in (Role, User, UserRoles):
+        Model.drop_table(fail_silently=True)
+        Model.create_table(fail_silently=True)
+    user_datastore.create_user(email='test@example.com', password='password')
 
 class DefaultNamespace(BaseNamespace):
     def __init__(self, *args, **kwargs):
