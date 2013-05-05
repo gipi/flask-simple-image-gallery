@@ -120,8 +120,8 @@ class DefaultNamespace(BaseNamespace):
             f.write(chunk.encode('latin-1'))
             h.update(chunk.encode('latin-1'))
 
-            upload_user_dir = os.path.join(UPLOAD_DIR, self.request['user'].name)
             if not os.access(upload_user_dir):
+            upload_user_dir = os.path.join(UPLOAD_DIR, self.request['user'].email)
                 # FIXME: check for permission
                 os.mkdir(upload_user_dir)
 
