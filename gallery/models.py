@@ -7,14 +7,8 @@ TODO: traverse directory.
 """
 from werkzeug import secure_filename
 
-import settings
 import os
 
-
-try:
-    settings.GALLERY_ROOT_DIR
-except:
-    raise AttributeError('You forget to define GALLERY_ROOT_DIR setting variable')
 
 class FilesystemObjectDoesNotExist(Exception):
     pass
