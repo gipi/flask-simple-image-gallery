@@ -45,6 +45,8 @@ def upload():
 
         return ("ok", 201,)
 
+    return (simplejson.dumps({'error': 'you need to pass an image'}), 400)
+
 # FIXME: make more modular to avoid the import below
 # this import is here to avoid circular hell import
 import app
