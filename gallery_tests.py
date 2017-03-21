@@ -1,4 +1,6 @@
+import shutil
 import unittest
+import tempfile
 from StringIO import StringIO
 
 from app import app
@@ -8,6 +10,10 @@ class GalleryTestCase(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
         self.client = app.test_client()
+        app.config['GALLERY_ROOT_DIR'] = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(app.config['GALLERY_ROOT_DIR'])
 
     def test_index(self):
         response = self.client.get('/')

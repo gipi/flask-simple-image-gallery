@@ -9,7 +9,7 @@ gallery = Blueprint('gallery', __name__, template_folder='templates', static_fol
 
 @gallery.route('/', methods=['GET', 'POST',])
 def show_gallery():
-    images = Image.all()
+    images = Image.all(current_app.config['GALLERY_ROOT_DIR'])
     return render_template('index.html', images=images)
 
 @gallery.route('/json')
@@ -17,7 +17,7 @@ def json():
     """Return a JSON containing an array of URL pointing to
     the images.
     """
-    images = Image.all()
+    images = Image.all(current_app.config['GALLERY_ROOT_DIR'])
     start = 0
     stop = len(images)
 
@@ -41,7 +41,7 @@ def json():
 def upload():
     if request.method == 'POST' and 'image' in request.files:
         image = request.files['image']
-        Image('', image)
+        Image('', post=image, root=current_app.config['GALLERY_ROOT_DIR'])
 
         return ("ok", 201,)
 

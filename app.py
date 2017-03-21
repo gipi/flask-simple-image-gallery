@@ -3,6 +3,7 @@ import os
 
 from flask import Flask, redirect, url_for
 from gallery.views import gallery
+import settings
 
 
 ROOT_DIR = os.path.dirname(__file__)
@@ -18,6 +19,7 @@ UPLOAD_ALLOWED_EXTENSIONS = (
 
 app = Flask(__name__)
 app.register_blueprint(gallery, url_prefix='/gallery')
+app.config['GALLERY_ROOT_DIR'] = settings.GALLERY_ROOT_DIR
 
 @app.route('/')
 def index():

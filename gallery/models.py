@@ -20,7 +20,7 @@ class FilesystemObjectDoesNotExist(Exception):
     pass
 
 class FilesystemObject(object):
-    def __init__(self, filename, post=None):
+    def __init__(self, filename, post=None, root=None):
         """Create an object from the information of the given filename or from a
         uploaded file.
 
@@ -30,7 +30,7 @@ class FilesystemObject(object):
                 f = FilesystemObject('cats.png', request.POST['photo'])
 
         """
-        self.root_dir = settings.GALLERY_ROOT_DIR
+        self.root_dir = root
         self.filename = filename if not post else secure_filename(post.filename)
         self.abspath  = os.path.join(self.root_dir, filename)
 
@@ -51,10 +51,11 @@ class FilesystemObject(object):
         post.save(os.path.join(self.root_dir, self.filename))
 
     @classmethod
-    def all(cls):
+    def all(cls, root):
         """Return a list of files contained in the directory pointed by settings.GALLERY_ROOT_DIR.
         """
-        return [cls(x) for x in os.listdir(settings.GALLERY_ROOT_DIR)]
+        return [cls(x) for x in os.listdir(root)]
 
 class Image(FilesystemObject):
     pass
+
