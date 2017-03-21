@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, current_app
-from flask.ext.login import login_user
 import simplejson
 from .models import Image
 
@@ -10,13 +9,6 @@ gallery = Blueprint('gallery', __name__, template_folder='templates', static_fol
 
 @gallery.route('/', methods=['GET', 'POST',])
 def show_gallery():
-    if request.method == 'POST':
-        if 'username' in request.form and 'password' in request.form:
-            username = request.form['username']
-            password = request.form['password']
-            current_app.logger.debug('%s:%s' % (username, password))
-            if username == 'test' and password == 'password':
-                login_user(app.User.users(''))
     images = Image.all()
     return render_template('index.html', images=images)
 

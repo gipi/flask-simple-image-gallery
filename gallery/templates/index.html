@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
-    <title>
+    <head>
+        <title>Gallery</title>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    </title>
+    </head>
     <body>
         <style>
         .item {
@@ -11,81 +12,13 @@
             margin:10px;
         }
         </style>
-        <header>
-            {% if current_user.is_authenticated() %}
-            <h2>{{ current_user.name }}</h2>
-            {% else %}
-            <form method="post">
-                <input type="text" name="username"/>
-                <input type="password" name="password"/>
-                <input type="submit" value="sign in"/>
-            </form>
-            {% endif %}
-        </header>
         <input id="file_uploader" type="file" name="file"/>
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('gallery.static', filename='jquery.masonry.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
-        <script type="text/javascript">
-        (function(){
-            var socket = io.connect('http://localhost:8080/default');
-            var file_uploader = document.getElementById('file_uploader');
-            var fileReader;
-
-            socket.on('connect', function(){
-                console.log('connect');
-            })
-
-            socket.on('stream', function() {
-                var f = uploaded_file.slice();
-
-                fileReader.readAsBinaryString(f)
-            });
-
-            socket.on('error', function(data) {
-                alert(data);
-            });
-
-            //socket.emit('localized');I//
-            if(!window.File || !window.FileReader) {
-                alert('please use a modern browser that implements File and FileReader API');
-                return false;
-            }
-
-            var uploaded_file;
-
-            function on_file_chose(evt) {
-                fileReader = new FileReader();
-                console.log(evt);
-                fileReader.onload = function(evt) {
-                    console.log('onload: ');
-                    console.log(evt);
-                    socket.emit('upload', {chunk: evt.target.result});
-                }
-
-                uploaded_file = evt.target.files[0]
-
-                socket.emit('start', {size: uploaded_file.size, name: file_uploader.value});
-            }
-
-            file_uploader.addEventListener('change', on_file_chose);
-        })();
-        $(function(){
-            var $container = $('#container');
-            $container.imagesLoaded(function() {
-                $container.masonry({
-                    // options
-                    itemSelector : '.item',
-                    columnWidth : 240
-                });
-            });
-        });
-        </script>
         <ul id="container">
             {% for image in images %}
             <img class="item" src="{{ url_for('static', filename=['gallery', image.filename ]|join('/')) }}"/>
             {% endfor %}
         </ul>
-        <p>miao</p>
     </body>
 </html>
