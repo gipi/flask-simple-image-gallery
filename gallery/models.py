@@ -48,7 +48,7 @@ class FilesystemObject(object):
     def all(cls, root):
         """Return a list of files contained in the directory pointed by settings.GALLERY_ROOT_DIR.
         """
-        return [cls(x) for x in os.listdir(root)]
+        return [cls(filename = x, root = root) for x in os.listdir(root)]
 
 class Image(FilesystemObject):
     pass
