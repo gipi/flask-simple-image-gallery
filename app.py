@@ -21,9 +21,11 @@ app = Flask(__name__)
 app.register_blueprint(gallery, url_prefix='/gallery')
 app.config['GALLERY_ROOT_DIR'] = settings.GALLERY_ROOT_DIR
 
+
 @app.route('/')
 def index():
     return redirect(url_for('gallery.show_gallery'))
+
 
 if __name__ == '__main__':
     app.logger.info('Listening on http://localhost:8000')

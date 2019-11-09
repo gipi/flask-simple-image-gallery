@@ -13,7 +13,9 @@ import os
 class FilesystemObjectDoesNotExist(Exception):
     pass
 
+
 class FilesystemObject(object):
+
     def __init__(self, filename, post=None, root=None):
         """Create an object from the information of the given filename or from a
         uploaded file.
@@ -48,8 +50,8 @@ class FilesystemObject(object):
     def all(cls, root):
         """Return a list of files contained in the directory pointed by settings.GALLERY_ROOT_DIR.
         """
-        return [cls(filename = x, root = root) for x in os.listdir(root)]
+        return [cls(filename=x, root=root) for x in os.listdir(root)]
+
 
 class Image(FilesystemObject):
     pass
-

@@ -7,10 +7,12 @@ from .models import Image
 #  https://github.com/mitsuhiko/flask/issues/348
 gallery = Blueprint('gallery', __name__, template_folder='templates', static_folder='static')
 
-@gallery.route('/', methods=['GET', 'POST',])
+
+@gallery.route('/', methods=['GET', 'POST'])
 def show_gallery():
     images = Image.all(current_app.config['GALLERY_ROOT_DIR'])
     return render_template('index.html', images=images)
+
 
 @gallery.route('/json')
 def json():
@@ -37,7 +39,7 @@ def json():
     return simplejson.dumps(image_filenames)
 
 
-@gallery.route('/upload', methods=['POST',])
+@gallery.route('/upload', methods=['POST'])
 def upload():
     if request.method == 'POST' and 'image' in request.files:
         image = request.files['image']
@@ -46,7 +48,3 @@ def upload():
         return ("ok", 201,)
 
     return (simplejson.dumps({'error': 'you need to pass an image'}), 400)
-
-# FIXME: make more modular to avoid the import below
-# this import is here to avoid circular hell import
-import app
