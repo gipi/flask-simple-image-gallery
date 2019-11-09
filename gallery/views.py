@@ -34,7 +34,7 @@ def json():
 
     images = images[start:stop]
 
-    image_filenames = map(lambda x: x.filename, images)
+    image_filenames = list(map(lambda x: x.filename, images))
 
     return simplejson.dumps(image_filenames)
 
