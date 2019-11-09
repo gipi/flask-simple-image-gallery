@@ -41,10 +41,13 @@ def json():
 
 @gallery.route('/upload', methods=['POST'])
 def upload():
+    current_app.logger.info(f'uploading')
     if request.method == 'POST' and 'image' in request.files:
         image = Image('', post=request.files['image'], root=current_app.config['GALLERY_ROOT_DIR'])
 
         if image.path.suffix in current_app.config['UPLOAD_ALLOWED_EXTENSIONS']:
             return ("ok", 201,)
+
+        current_app.logger.info(f'failed to upload {image!r}')
 
     return (jsonify({'error': 'you need to pass an image'}), 400)

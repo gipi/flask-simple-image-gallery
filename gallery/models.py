@@ -41,6 +41,9 @@ class FilesystemObject(object):
             logger.error(e)
             raise FilesystemObjectDoesNotExist(e)
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(filename={self.path}, root={self.root_dir})>'
+
     def upload(self, post):
         """Get a POST file and save it to the settings.GALLERY_ROOT_DIR"""
         # TODO: handle filename conflicts

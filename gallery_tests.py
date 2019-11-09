@@ -53,6 +53,18 @@ class GalleryTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_POST_upload_w_valid_image(self):
+        '''Only certain type of files can be uploaded'''
+        # https://gist.github.com/DazWorrall/1779861
+        response = self.client.post(
+            '/gallery/upload',
+            data = {
+                'image': (BytesIO(b'my file contents'), 'hello world.png'),
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+
 
 if __name__ == '__main__':
     unittest.main()
