@@ -5,6 +5,8 @@ This simple Flask application make easy to publish a gallery of images
 contained in a directory. Use the unix modification time to order images
 with the most recent to the top.
 
+**WARNING:** this is a **proof of concept** it's not secure at all!
+
 In order to test it you can install the dependencies using pip
 
  $ pip3 install -r requirements.txt
