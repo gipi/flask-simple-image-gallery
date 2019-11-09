@@ -29,7 +29,7 @@ class FilesystemObject(object):
                 f = FilesystemObject('cats.png', request.POST['photo'])
 
         """
-        self.root_dir = root
+        self.root_dir = Path(root)
         self.path = Path(filename if not post else secure_filename(post.filename))
 
         if post:
@@ -50,7 +50,9 @@ class FilesystemObject(object):
         """Get a POST file and save it to the settings.GALLERY_ROOT_DIR"""
         # TODO: handle filename conflicts
         # http://flask.pocoo.org/docs/patterns/fileuploads/
-        post.save(os.path.join(self.root_dir, self.path))
+        path_saving = self.root_dir / self.path
+        current_app.logger.info(f'saving at \'{path_saving}\'')
+        post.save(str(path_saving))
 
     @classmethod
     def all(cls, root):
