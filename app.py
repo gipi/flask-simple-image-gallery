@@ -1,7 +1,8 @@
 # encoding:utf-8
 import os
+import sys
 
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, send_from_directory
 from gallery.views import gallery
 import settings
 
@@ -31,13 +32,18 @@ UPLOAD_DIR = os.path.join(ROOT_DIR, 'uploads')
 
 app = Flask(__name__)
 app.register_blueprint(gallery, url_prefix='/gallery')
-app.config['GALLERY_ROOT_DIR'] = settings.GALLERY_ROOT_DIR
+app.config['GALLERY_ROOT_DIR'] = settings.GALLERY_ROOT_DIR if len(sys.argv) < 2 else sys.argv[1]
 app.config['UPLOAD_ALLOWED_EXTENSIONS'] = settings.UPLOAD_ALLOWED_EXTENSIONS
 
 
 @app.route('/')
 def index():
     return redirect(url_for('gallery.show_gallery'))
+
+
+@app.route('/cdn/<path:filename>')
+def custom_static(filename):
+    return send_from_directory(app.config['GALLERY_ROOT_DIR'], filename)
 
 
 if __name__ == '__main__':
