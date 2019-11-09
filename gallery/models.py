@@ -3,10 +3,12 @@ This module aims to create a model having the filesystem as backend, since
 if someone don't want to add extra metadata more than the metadata given
 by the file informations is useless to use a database.
 
-TODO: traverse directory.
+TODO
+    - traverse directory
+    - check symlink
 """
 from werkzeug import secure_filename
-
+from pathlib import Path
 import os
 
 
@@ -27,24 +29,23 @@ class FilesystemObject(object):
 
         """
         self.root_dir = root
-        self.filename = filename if not post else secure_filename(post.filename)
-        self.abspath  = os.path.join(self.root_dir, filename)
+        self.path = Path(filename if not post else secure_filename(post.filename))
 
         if post:
             self.upload(post)
 
         try:
-            stats = os.stat(self.abspath)
+            stats = os.stat(self.path)
+            self.timestamp = stats.st_mtime
         except IOError as e:
-            raise FilesystemObjectDoesNotExist(e.message)
-
-        self.timestamp = stats.st_mtime
+            logger.error(e)
+            raise FilesystemObjectDoesNotExist(e)
 
     def upload(self, post):
         """Get a POST file and save it to the settings.GALLERY_ROOT_DIR"""
         # TODO: handle filename conflicts
         # http://flask.pocoo.org/docs/patterns/fileuploads/
-        post.save(os.path.join(self.root_dir, self.filename))
+        post.save(os.path.join(self.root_dir, self.path))
 
     @classmethod
     def all(cls, root):

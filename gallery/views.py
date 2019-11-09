@@ -34,7 +34,7 @@ def json():
 
     images = images[start:stop]
 
-    image_filenames = list(map(lambda x: x.filename, images))
+    image_filenames = list(map(lambda x: str(x.path), images))
 
     return jsonify(image_filenames)
 
@@ -42,8 +42,7 @@ def json():
 @gallery.route('/upload', methods=['POST'])
 def upload():
     if request.method == 'POST' and 'image' in request.files:
-        image = request.files['image']
-        Image('', post=image, root=current_app.config['GALLERY_ROOT_DIR'])
+        image = Image('', post=request.files['image'], root=current_app.config['GALLERY_ROOT_DIR'])
 
         return ("ok", 201,)
 
