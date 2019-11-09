@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, current_app
-import simplejson
+from flask import jsonify
 from .models import Image
 
 
@@ -36,7 +36,7 @@ def json():
 
     image_filenames = list(map(lambda x: x.filename, images))
 
-    return simplejson.dumps(image_filenames)
+    return jsonify(image_filenames)
 
 
 @gallery.route('/upload', methods=['POST'])
@@ -47,4 +47,4 @@ def upload():
 
         return ("ok", 201,)
 
-    return (simplejson.dumps({'error': 'you need to pass an image'}), 400)
+    return (jsonify({'error': 'you need to pass an image'}), 400)

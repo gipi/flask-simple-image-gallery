@@ -1,5 +1,6 @@
 import shutil
 import unittest
+from pathlib import Path
 import tempfile
 from io import BytesIO
 
@@ -11,7 +12,9 @@ class GalleryTestCase(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
         self.client = app.test_client()
-        app.config['GALLERY_ROOT_DIR'] = tempfile.mkdtemp()
+        tmp = tempfile.mkdtemp()
+        app.config['GALLERY_ROOT_DIR'] = tmp
+        (Path(tmp) / "miao").touch()
 
     def tearDown(self):
         shutil.rmtree(app.config['GALLERY_ROOT_DIR'])
@@ -25,7 +28,8 @@ class GalleryTestCase(unittest.TestCase):
         response = self.client.get('/gallery/json')
 
         assert response.status_code == 200
-        self.assertEqual(response.data, "miao")
+        self.assertEqual(response.data, b'["miao"]\n')
+        self.assertEqual(response.content_type, 'application/json')
 
     def test_GET_upload(self):
         response = self.client.get('/gallery/upload')
