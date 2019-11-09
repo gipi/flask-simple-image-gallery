@@ -1,7 +1,7 @@
 import shutil
 import unittest
 import tempfile
-from StringIO import StringIO
+from io import BytesIO
 
 from app import app
 
@@ -43,7 +43,7 @@ class GalleryTestCase(unittest.TestCase):
         response = self.client.post(
             '/gallery/upload',
             data = {
-                'image': (StringIO('my file contents'), 'hello world.txt'),
+                'image': (BytesIO(b'my file contents'), 'hello world.txt'),
             },
         )
 
