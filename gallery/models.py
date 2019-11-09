@@ -31,12 +31,13 @@ class FilesystemObject(object):
         """
         self.root_dir = Path(root)
         self.path = Path(filename if not post else secure_filename(post.filename))
+        self.abspath = self.root_dir / self.path
 
         if post:
             self.upload(post)
 
         try:
-            stats = os.stat(self.path)
+            stats = os.stat(self.abspath)
             self.timestamp = stats.st_mtime
         except IOError as e:
             current_app.logger.error(e)
@@ -50,9 +51,8 @@ class FilesystemObject(object):
         """Get a POST file and save it to the settings.GALLERY_ROOT_DIR"""
         # TODO: handle filename conflicts
         # http://flask.pocoo.org/docs/patterns/fileuploads/
-        path_saving = self.root_dir / self.path
-        current_app.logger.info(f'saving at \'{path_saving}\'')
-        post.save(str(path_saving))
+        current_app.logger.info(f'saving at \'{self.abspath}\'')
+        post.save(str(self.abspath))
 
     @classmethod
     def all(cls, root):
