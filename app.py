@@ -27,17 +27,12 @@ dictConfig({
 ROOT_DIR = os.path.dirname(__file__)
 
 UPLOAD_DIR = os.path.join(ROOT_DIR, 'uploads')
-UPLOAD_ALLOWED_EXTENSIONS = (
-    'jpg',
-    'jpeg',
-    'png',
-    'gif',
-)
 
 
 app = Flask(__name__)
 app.register_blueprint(gallery, url_prefix='/gallery')
 app.config['GALLERY_ROOT_DIR'] = settings.GALLERY_ROOT_DIR
+app.config['UPLOAD_ALLOWED_EXTENSIONS'] = settings.UPLOAD_ALLOWED_EXTENSIONS
 
 
 @app.route('/')

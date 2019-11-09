@@ -44,6 +44,7 @@ def upload():
     if request.method == 'POST' and 'image' in request.files:
         image = Image('', post=request.files['image'], root=current_app.config['GALLERY_ROOT_DIR'])
 
-        return ("ok", 201,)
+        if image.path.suffix in current_app.config['UPLOAD_ALLOWED_EXTENSIONS']:
+            return ("ok", 201,)
 
     return (jsonify({'error': 'you need to pass an image'}), 400)
