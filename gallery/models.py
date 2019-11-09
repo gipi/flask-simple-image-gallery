@@ -7,6 +7,7 @@ TODO
     - traverse directory
     - check symlink
 """
+from flask import current_app
 from werkzeug import secure_filename
 from pathlib import Path
 import os
@@ -38,7 +39,8 @@ class FilesystemObject(object):
             stats = os.stat(self.path)
             self.timestamp = stats.st_mtime
         except IOError as e:
-            logger.error(e)
+            current_app.logger.error(e)
+            current_app.logger.error(f'{self!r}')
             raise FilesystemObjectDoesNotExist(e)
 
     def __repr__(self):
