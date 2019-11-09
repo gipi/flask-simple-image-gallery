@@ -7,7 +7,7 @@ with the most recent to the top.
 
 In order to test it you can install the dependencies using pip
 
- $ pip install -r requirements.txt
+ $ pip3 install -r requirements.txt
 
 The images must be in a directory pointed by GALLERY_ROOT_DIR settings.
 
